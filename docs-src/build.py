@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds the p5.motion docs folder.
+"""Builds the p5.videomotion docs folder.
 
   python3 build.py <out_dir>
 
@@ -14,7 +14,7 @@ sys.path.insert(0, HERE)
 from examples_src import EXAMPLES  # noqa: E402
 
 OUT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "..", "docs"))
-LIB = os.path.join(HERE, "..", "p5.motion.js")
+LIB = os.path.join(HERE, "..", "p5.videomotion.js")
 P5_CDN = "https://cdn.jsdelivr.net/npm/p5@2/lib/p5.min.js"
 VERSION = "0.1.0"
 
@@ -84,7 +84,7 @@ def toc_html(toc):
     return "".join(out)
 
 
-def page(title, body, root, active=None, head_extra="", lead_toc=True, subtitle="From the p5.motion documentation"):
+def page(title, body, root, active=None, head_extra="", lead_toc=True, subtitle="From the p5.videomotion documentation"):
     body, toc = add_ids_and_toc(body)
     toc_block = toc_html(toc) if lead_toc else ""
     # TOC goes before the first h2, after the lead section (like Wikipedia)
@@ -99,7 +99,7 @@ def page(title, body, root, active=None, head_extra="", lead_toc=True, subtitle=
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{html.escape(title)} — p5.motion</title>
+<title>{html.escape(title)} — p5.videomotion</title>
 <link rel="stylesheet" href="{root}style.css">
 {head_extra}
 </head>
@@ -115,7 +115,7 @@ def page(title, body, root, active=None, head_extra="", lead_toc=True, subtitle=
 <h1 id="firstHeading">{title}</h1>
 <div class="siteSub">{subtitle}</div>
 {body}
-<div id="footer">p5.motion {VERSION} · MIT License · Inspired by p5.vida by Paweł Janicki.</div>
+<div id="footer">p5.videomotion {VERSION} · MIT License · Inspired by p5.vida by Paweł Janicki.</div>
 </div>
 </body>
 </html>
@@ -144,14 +144,14 @@ def build():
     os.makedirs(os.path.join(OUT, "examples"))
 
     shutil.copy(os.path.join(HERE, "style.css"), os.path.join(OUT, "style.css"))
-    shutil.copy(LIB, os.path.join(OUT, "lib", "p5.motion.js"))
+    shutil.copy(LIB, os.path.join(OUT, "lib", "p5.videomotion.js"))
     with open(os.path.join(OUT, "examples", "example-page.js"), "w") as f:
         f.write(EXAMPLE_HELPER)
 
     # article pages
     for name, title, subtitle in [
-        ("index", "p5.motion", "From the p5.motion documentation, a camera motion tracking library for p5.js"),
-        ("reference", "p5.motion reference", "From the p5.motion documentation"),
+        ("index", "p5.videomotion", "From the p5.videomotion documentation, a camera motion tracking library for p5.js"),
+        ("reference", "p5.videomotion reference", "From the p5.videomotion documentation"),
     ]:
         with open(os.path.join(HERE, name + ".body.html")) as f:
             body = f.read()
@@ -197,26 +197,26 @@ def build():
             used[label] = anchor
         used_links = ", ".join(f'<a href="../../reference.html#{a}"><code>{l}</code></a>'
                                for l, a in sorted(used.items(), key=lambda kv: kv[0].lower()))
-        body = f"""<div class="hatnote">Part of the <a href="../../examples.html">p5.motion examples</a> · Category: {html.escape(e["category"])}</div>
+        body = f"""<div class="hatnote">Part of the <a href="../../examples.html">p5.videomotion examples</a> · Category: {html.escape(e["category"])}</div>
 <p>{html.escape(e["summary"])}</p>
 <div id="sketch-frame"><div id="sketch"></div>
 <div class="sketch-caption">Live sketch. Allow camera access when the browser asks. If nothing appears, see <a href="../../index.html#troubleshooting">Troubleshooting</a>.</div></div>
 <h2>Source code</h2>
-<p>Save as <code>sketch.js</code> next to an <code>index.html</code> that loads p5.js and <code>p5.motion.js</code> (see <a href="../../index.html#installation">Installation</a>).</p>
+<p>Save as <code>sketch.js</code> next to an <code>index.html</code> that loads p5.js and <code>p5.videomotion.js</code> (see <a href="../../index.html#installation">Installation</a>).</p>
 <pre class="source">{html.escape(e["code"])}</pre>
 <h2>Used in this example</h2>
 <p>{used_links}</p>
 {pager}"""
         head = (f'<script src="{P5_CDN}"></script>\n'
-                f'<script src="../../lib/p5.motion.js"></script>\n'
+                f'<script src="../../lib/p5.videomotion.js"></script>\n'
                 f'<script src="../example-page.js" defer></script>\n'
                 f'<script src="sketch.js" defer></script>')
         with open(os.path.join(d, "index.html"), "w") as f:
             f.write(page(e["title"], body, "../../", head_extra=head, lead_toc=False,
-                         subtitle="p5.motion example"))
+                         subtitle="p5.videomotion example"))
 
     # examples index
-    parts = [f"""<p>These {len(EXAMPLES)} sketches each show one part of p5.motion. Every page runs the sketch live
+    parts = [f"""<p>These {len(EXAMPLES)} sketches each show one part of p5.videomotion. Every page runs the sketch live
 and lists its full source. All of them use the webcam except <a href="examples/no-camera/index.html">Without a camera</a>.</p>
 <p>The examples load p5.js from a CDN, and browsers only give pages camera access over <code>https://</code> or
 <code>http://localhost</code>. Serve this folder with a local web server (see <a href="index.html#installation">Installation</a>)

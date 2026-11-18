@@ -1,4 +1,4 @@
-// p5.motion starter: webcam, adaptive background, 2 zones, blobs, flow
+// p5.videomotion starter: webcam, adaptive background, 2 zones, blobs, flow
 
 let cam, motion;
 

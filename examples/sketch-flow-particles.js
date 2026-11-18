@@ -1,4 +1,4 @@
-// p5.motion example: particles pushed around by optical flow
+// p5.videomotion example: particles pushed around by optical flow
 // Wave your hands; the particles get swept in the direction you move.
 
 let cam, motion;

@@ -1,5 +1,5 @@
 <table class="infobox">
-<caption>p5.motion</caption>
+<caption>p5.videomotion</caption>
 <tr><th>Type</th><td>p5.js add-on library</td></tr>
 <tr><th>Purpose</th><td>Camera motion tracking</td></tr>
 <tr><th>Version</th><td>0.1.0</td></tr>
@@ -12,12 +12,12 @@
 <tr><th>Docs</th><td><a href="reference.html">Reference</a> · <a href="examples.html">Examples</a></td></tr>
 </table>
 
-<p><b>p5.motion</b> is an add-on library for <a href="https://p5js.org">p5.js</a> that detects movement in a webcam or video image and turns it into values you can draw with. It finds <i>where</i> things move (a motion mask and tracked <a href="#blobs">blobs</a>), <i>whether</i> anything moves inside regions you define (<a href="#zones">zones</a>), and <i>which way and how fast</i> things move (<a href="#optical-flow">optical flow</a>).</p>
+<p><b>p5.videomotion</b> is an add-on library for <a href="https://p5js.org">p5.js</a> that detects movement in a webcam or video image and turns it into values you can draw with. It finds <i>where</i> things move (a motion mask and tracked <a href="#blobs">blobs</a>), <i>whether</i> anything moves inside regions you define (<a href="#zones">zones</a>), and <i>which way and how fast</i> things move (<a href="#optical-flow">optical flow</a>).</p>
 
 <p>It is written for interactive installations, performances and teaching. Everything is reported in canvas pixels, it updates itself every frame, and it uses the same callback style as p5.js. It is a rewrite of the ideas in <a href="#migrating-from-p5-vida">p5.vida</a>: about four to five times faster, and with optical flow added.</p>
 
 <h2>Overview</h2>
-<p>A sketch using p5.motion creates one <i>motion object</i> from a video source and reads results from it in <code>draw()</code>:</p>
+<p>A sketch using p5.videomotion creates one <i>motion object</i> from a video source and reads results from it in <code>draw()</code>:</p>
 <ul>
 <li><b>Motion mask</b> — which pixels differ from the learned background (<a href="reference.html#ref-mask"><code>motion.mask</code></a>), and what fraction of the frame is moving (<a href="reference.html#ref-amount"><code>motion.amount</code></a>).</li>
 <li><b>Blobs</b> — connected regions of motion with bounding box, centre of mass, outline, velocity and a persistent id (<a href="reference.html#ref-blobs"><code>motion.blobs</code></a>).</li>
@@ -27,11 +27,11 @@
 </ul>
 
 <h2>Installation</h2>
-<p>Download <a href="lib/p5.motion.js"><code>p5.motion.js</code></a> and load it after p5.js:</p>
+<p>Download <a href="lib/p5.videomotion.js"><code>p5.videomotion.js</code></a> and load it after p5.js:</p>
 <pre>&lt;script src="https://cdn.jsdelivr.net/npm/p5@2/lib/p5.min.js"&gt;&lt;/script&gt;
-&lt;script src="p5.motion.js"&gt;&lt;/script&gt;
+&lt;script src="p5.videomotion.js"&gt;&lt;/script&gt;
 &lt;script src="sketch.js"&gt;&lt;/script&gt;</pre>
-<p>In the p5.js Web Editor, upload <code>p5.motion.js</code> to the sketch and add the second line to <code>index.html</code>.</p>
+<p>In the p5.js Web Editor, upload <code>p5.videomotion.js</code> to the sketch and add the second line to <code>index.html</code>.</p>
 
 <h3>Serving the page</h3>
 <p>Browsers only allow camera access on pages served over <code>https://</code> or from <code>http://localhost</code>. Opening <code>index.html</code> straight from disk (<code>file://</code>) will not work. From the sketch's folder, run any small web server, for example:</p>
@@ -41,7 +41,7 @@ python3 -m http.server 8000</pre>
 <p>then open the address it prints (for example <code>http://localhost:8000</code>).</p>
 
 <h3>p5.js versions</h3>
-<p>p5.motion is written for p5.js 2.x and registers itself with the 2.x add-on system. It also runs on p5.js 1.x (tested with 1.11), where it uses the older <i>pre</i>-draw hook. Older 1.x versions without <code>createCapture(VIDEO, { flipped: true })</code> can use the <code>flip: true</code> option instead, mirroring the drawn image themselves with <code>scale(-1, 1)</code>.</p>
+<p>p5.videomotion is written for p5.js 2.x and registers itself with the 2.x add-on system. It also runs on p5.js 1.x (tested with 1.11), where it uses the older <i>pre</i>-draw hook. Older 1.x versions without <code>createCapture(VIDEO, { flipped: true })</code> can use the <code>flip: true</code> option instead, mirroring the drawn image themselves with <code>scale(-1, 1)</code>.</p>
 
 <h2>Quick start</h2>
 <pre>let cam, motion;
@@ -67,7 +67,7 @@ function draw() {
 <h2>Concepts</h2>
 
 <h3>Coordinates</h3>
-<p>Internally the camera image is shrunk to a small <i>processing resolution</i> (320 pixels wide by default), because motion analysis does not need full camera detail and every pixel costs time. You never deal with that resolution directly: everything you give p5.motion (zone rectangles, <code>flowAt()</code> positions) and everything it gives back (blob boxes, flow vectors) is in <b>canvas pixels</b>.</p>
+<p>Internally the camera image is shrunk to a small <i>processing resolution</i> (320 pixels wide by default), because motion analysis does not need full camera detail and every pixel costs time. You never deal with that resolution directly: everything you give p5.videomotion (zone rectangles, <code>flowAt()</code> positions) and everything it gives back (blob boxes, flow vectors) is in <b>canvas pixels</b>.</p>
 <p>By default the camera is assumed to cover the whole canvas, which matches <code>image(cam, 0, 0, width, height)</code>. If you draw it somewhere else, tell the tracker with <a href="reference.html#ref-mapto"><code>mapTo(x, y, w, h)</code></a> and all coordinates follow. Blobs also have normalized (0–1) coordinates if you need them independent of the canvas.</p>
 
 <h3>How a frame is processed</h3>
@@ -99,7 +99,7 @@ function draw() {
 <p>A zone measures the fraction of its area that is in the motion mask (<code>amount</code>). When that reaches the zone's <code>threshold</code> (2% by default) the zone becomes <code>active</code> and <code>onEnter</code> fires; when it drops below, <code>onExit</code> fires. Zones also report the average direction of movement inside them (<code>zone.flow</code>). Thanks to the summed-area table, a zone costs the same however large it is, so dozens of zones are fine.</p>
 
 <h3>Optical flow</h3>
-<p>Optical flow estimates how each part of the image moved between two frames. p5.motion uses the <i>Lucas–Kanade</i> method on a grid of points (every 8 processing pixels by default). For each point it finds the small shift that best lines up a patch of the previous frame with the current one. It works on an <i>image pyramid</i>: first on heavily shrunk copies of the frame to catch large movements, then on sharper copies to refine them. With the default 4 levels, movements of about 10 processing pixels per frame (roughly 20 canvas pixels on a 640-wide canvas) are measured accurately.</p>
+<p>Optical flow estimates how each part of the image moved between two frames. p5.videomotion uses the <i>Lucas–Kanade</i> method on a grid of points (every 8 processing pixels by default). For each point it finds the small shift that best lines up a patch of the previous frame with the current one. It works on an <i>image pyramid</i>: first on heavily shrunk copies of the frame to catch large movements, then on sharper copies to refine them. With the default 4 levels, movements of about 10 processing pixels per frame (roughly 20 canvas pixels on a 640-wide canvas) are measured accurately.</p>
 <p>Limits that come from the method itself:</p>
 <ul>
 <li><b>It needs texture.</b> A flat, single-coloured surface looks the same wherever it moves, so no motion can be measured there. Such patches are reported as zero (see <code>minTexture</code>). Faces, hands, clothing and hair have plenty of texture. Plain walls and dark areas do not.</li>
@@ -111,7 +111,7 @@ function draw() {
 <h2>Performance</h2>
 <p>Update time per frame for the same synthetic scene in Chrome, compared with p5.vida (converted to p5.js 2.x). The figures come from a headless test machine, so treat them as relative rather than absolute.</p>
 <table class="wikitable">
-<tr><th>Processing size</th><th>p5.vida</th><th>p5.motion</th><th>p5.motion + flow</th></tr>
+<tr><th>Processing size</th><th>p5.vida</th><th>p5.videomotion</th><th>p5.videomotion + flow</th></tr>
 <tr><td>160 × 120</td><td>2.1 ms</td><td>0.7 ms</td><td>1.4 ms</td></tr>
 <tr><td>320 × 240 (default)</td><td>7.0 ms</td><td>1.6 ms</td><td>3.2 ms</td></tr>
 <tr><td>640 × 480</td><td>30.4 ms</td><td>6.2 ms</td><td>12.0 ms</td></tr>
@@ -146,7 +146,7 @@ function draw() {
 <dt>Nothing happens and there is no camera image</dt>
 <dd>The page must be served from <code>http://localhost</code> or <code>https://</code> (see <a href="#serving-the-page">Serving the page</a>), and you must allow camera access. Check the browser's address bar for a blocked-camera icon.</dd>
 <dt><code>createMotion is not defined</code></dt>
-<dd><code>p5.motion.js</code> did not load, or loaded before p5.js. Check the order of the <code>&lt;script&gt;</code> tags and the browser console for a 404.</dd>
+<dd><code>p5.videomotion.js</code> did not load, or loaded before p5.js. Check the order of the <code>&lt;script&gt;</code> tags and the browser console for a 404.</dd>
 <dt>The mask, zones or blobs are mirrored relative to the image</dt>
 <dd>The tracker mirrors only when the capture was created with <code>{ flipped: true }</code>, or with the <code>flip</code> option. Make the image you draw and the tracker agree: draw the capture with <code>image()</code> (which respects <code>flipped</code>), or set <code>flip</code> explicitly.</dd>
 <dt>Zones and blobs are offset from the camera image</dt>
@@ -158,9 +158,9 @@ function draw() {
 </dl>
 
 <h2 id="migrating-from-p5-vida">Migrating from p5.vida</h2>
-<p>p5.motion covers the same ground as p5.vida with a different API, so existing Vida sketches need small changes. The main differences: there is no <code>update()</code> call to make, coordinates are canvas pixels instead of normalized 0–1 values, and mirroring is handled by the capture itself.</p>
+<p>p5.videomotion covers the same ground as p5.vida with a different API, so existing Vida sketches need small changes. The main differences: there is no <code>update()</code> call to make, coordinates are canvas pixels instead of normalized 0–1 values, and mirroring is handled by the capture itself.</p>
 <table class="wikitable">
-<tr><th>p5.vida</th><th>p5.motion</th></tr>
+<tr><th>p5.vida</th><th>p5.videomotion</th></tr>
 <tr><td><code>vida = new Vida(this)</code></td><td><code>motion = createMotion(cam)</code></td></tr>
 <tr><td><code>vida.update(cam)</code> in <code>draw()</code></td><td>Automatic. Or <code>autoUpdate: false</code> and <code>motion.update()</code></td></tr>
 <tr><td><code>progressiveBackgroundFlag = true</code></td><td><code>background: 'adaptive'</code></td></tr>
@@ -199,8 +199,8 @@ function draw() {
 
 <h2>See also</h2>
 <ul>
-<li><a href="reference.html">p5.motion reference</a></li>
-<li><a href="examples.html">p5.motion examples</a> ({{EXAMPLE_COUNT}} sketches)</li>
+<li><a href="reference.html">p5.videomotion reference</a></li>
+<li><a href="examples.html">p5.videomotion examples</a> ({{EXAMPLE_COUNT}} sketches)</li>
 <li><a href="https://p5js.org/reference/p5/createCapture/">createCapture()</a> in the p5.js reference</li>
 <li><a href="https://tetoki.eu/vida">p5.vida</a> by Paweł Janicki, the library that inspired this one</li>
 <li><a href="https://en.wikipedia.org/wiki/Lucas%E2%80%93Kanade_method">Lucas–Kanade method</a> and <a href="https://en.wikipedia.org/wiki/Summed-area_table">Summed-area table</a> on Wikipedia</li>

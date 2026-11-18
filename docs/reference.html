@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>p5.motion reference — p5.motion</title>
+<title>p5.videomotion reference — p5.videomotion</title>
 <link rel="stylesheet" href="style.css">
 
 </head>
@@ -21,11 +21,11 @@
   <div class="portal"><h3>Version</h3><ul><li>0.1.0</li><li>p5.js 2.x (1.x compatible)</li></ul></div>
 </div>
 <div id="content">
-<h1 id="firstHeading">p5.motion reference</h1>
-<div class="siteSub">From the p5.motion documentation</div>
+<h1 id="firstHeading">p5.videomotion reference</h1>
+<div class="siteSub">From the p5.videomotion documentation</div>
 <div class="hatnote">For an introduction, see the <a href="index.html">main page</a>. For runnable sketches, see <a href="examples.html">Examples</a>.</div>
 
-<p>This page documents everything p5.motion adds to p5.js: the <a href="#ref-createmotion"><code>createMotion()</code></a> function, its <a href="#options">options</a>, and the three kinds of object it gives you — the <a href="#the-motion-object">motion object</a>, <a href="#zones">zones</a> and <a href="#blobs">blobs</a>.</p>
+<p>This page documents everything p5.videomotion adds to p5.js: the <a href="#ref-createmotion"><code>createMotion()</code></a> function, its <a href="#options">options</a>, and the three kinds of object it gives you — the <a href="#the-motion-object">motion object</a>, <a href="#zones">zones</a> and <a href="#blobs">blobs</a>.</p>
 
 <p>Unless stated otherwise, every position, size, distance and speed is in <b>canvas pixels</b> (speeds are canvas pixels per frame), measured against the area the camera is mapped to (the whole canvas by default; see <a href="#ref-mapto"><code>mapTo()</code></a>). Values described as <i>fractions</i> run from 0 to 1.</p>
 
@@ -265,7 +265,7 @@ if (frameCount % 2 === 0) motion.update();</pre>
 }</pre>
 
 <h2 id="timing-and-update-order">Timing and update order</h2>
-<p>p5.motion registers a p5 <i>predraw</i> hook (on p5.js 1.x it uses the equivalent <i>pre</i> hook). Each frame, in order:</p>
+<p>p5.videomotion registers a p5 <i>predraw</i> hook (on p5.js 1.x it uses the equivalent <i>pre</i> hook). Each frame, in order:</p>
 <ol>
 <li>Every motion object with <code>autoUpdate</code> on processes the current source image.</li>
 <li>During that update, blob and zone callbacks fire (<code>onBlobEnter</code>, <code>onBlobExit</code>, <code>onEnter</code>, <code>onExit</code>, <code>onChange</code>).</li>
@@ -280,7 +280,7 @@ if (frameCount % 2 === 0) motion.update();</pre>
 <tr><td><code>p5.MotionTracker</code>, <code>p5.MotionZone</code>, <code>p5.MotionBlob</code></td><td>The classes, exposed for <code>instanceof</code> checks or extending with your own methods. Create trackers with <code>createMotion()</code> rather than calling these constructors.</td></tr>
 </table>
 
-<div id="footer">p5.motion 0.1.0 · MIT License · Inspired by p5.vida by Paweł Janicki.</div>
+<div id="footer">p5.videomotion 0.1.0 · MIT License · Inspired by p5.vida by Paweł Janicki.</div>
 </div>
 </body>
 </html>

@@ -1,5 +1,5 @@
 /*!
- * p5.motion.js v0.1.0
+ * p5.videomotion.js v0.1.0
  * Camera motion tracking for p5.js 2.x: background subtraction, blobs,
  * active zones and Lucas-Kanade optical flow.
  *
@@ -961,6 +961,6 @@
     else motionAddon(p5, p5.prototype, null);
   }
   else {
-    console.warn('[p5.motion] p5 was not found. Load p5.js before p5.motion.js.');
+    console.warn('[p5.videomotion] p5 was not found. Load p5.js before p5.videomotion.js.');
   }
 })();
