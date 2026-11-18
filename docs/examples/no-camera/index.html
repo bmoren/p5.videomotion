@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Without a camera — p5.motion</title>
+<link rel="stylesheet" href="../../style.css">
+<script src="https://cdn.jsdelivr.net/npm/p5@2/lib/p5.min.js"></script>
+<script src="../../lib/p5.motion.js"></script>
+<script src="../example-page.js" defer></script>
+<script src="sketch.js" defer></script>
+</head>
+<body>
+<div id="side">
+  <a id="logo" href="../../index.html"><span class="logo-mark">p5</span><span class="logo-word">.motion</span></a>
+  <div class="portal"><h3>Navigation</h3><ul>
+<li><a href="../../index.html">Main page</a></li>
+<li><a href="../../reference.html">Reference</a></li>
+<li><a href="../../examples.html">Examples</a></li>
+<li><a href="../../index.html#tuning">Tuning guide</a></li>
+<li><a href="../../index.html#troubleshooting">Troubleshooting</a></li>
+<li><a href="../../index.html#migrating-from-p5-vida">Migrating from p5.vida</a></li>
+  </ul></div>
+  <div class="portal"><h3>Version</h3><ul><li>0.1.0</li><li>p5.js 2.x (1.x compatible)</li></ul></div>
+</div>
+<div id="content">
+<h1 id="firstHeading">Without a camera</h1>
+<div class="siteSub">p5.motion example</div>
+<div class="hatnote">Part of the <a href="../../examples.html">p5.motion examples</a> · Category: Basics</div>
+<p>Uses a p5.Graphics with moving shapes as the source. Useful for testing and for sketches where the input is generated or loaded rather than filmed.</p>
+<div id="sketch-frame"><div id="sketch"></div>
+<div class="sketch-caption">Live sketch. Allow camera access when the browser asks. If nothing appears, see <a href="../../index.html#troubleshooting">Troubleshooting</a>.</div></div>
+<h2 id="source-code">Source code</h2>
+<p>Save as <code>sketch.js</code> next to an <code>index.html</code> that loads p5.js and <code>p5.motion.js</code> (see <a href="../../index.html#installation">Installation</a>).</p>
+<pre class="source">// Any p5.Graphics, p5.Image or video can be the source.
+let src, motion;
+
+function setup() {
+  createCanvas(640, 480);
+  src = createGraphics(320, 240);
+  motion = createMotion(src, { background: &#x27;frame&#x27; });
+  motion.zone(&#x27;middle&#x27;, 220, 140, 200, 200);
+}
+
+function draw() {
+  // draw the &quot;camera&quot; image: two balls moving on black
+  src.background(0);
+  src.noStroke();
+  src.fill(255);
+  src.circle(160 + sin(frameCount * 0.03) * 120, 80, 40);
+  src.fill(180);
+  src.circle(160, 160 + cos(frameCount * 0.05) * 60, 30);
+
+  // motion was updated from the previous frame&#x27;s drawing
+  image(src, 0, 0, width, height);
+  motion.debug();
+}
+</pre>
+<h2 id="used-in-this-example">Used in this example</h2>
+<p><a href="../../reference.html#ref-createmotion"><code>createMotion()</code></a>, <a href="../../reference.html#ref-debug"><code>debug</code></a>, <a href="../../reference.html#ref-zone"><code>zone</code></a></p>
+<p class="pager">← <a href="../starter/index.html">Starter</a> · <a href="../../examples.html">All examples</a> · <a href="../instance-mode/index.html">Instance mode</a> →</p>
+<div id="footer">p5.motion 0.1.0 · MIT License · Inspired by p5.vida by Paweł Janicki.</div>
+</div>
+</body>
+</html>

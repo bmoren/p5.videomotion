@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swipe gestures — p5.motion</title>
+<link rel="stylesheet" href="../../style.css">
+<script src="https://cdn.jsdelivr.net/npm/p5@2/lib/p5.min.js"></script>
+<script src="../../lib/p5.motion.js"></script>
+<script src="../example-page.js" defer></script>
+<script src="sketch.js" defer></script>
+</head>
+<body>
+<div id="side">
+  <a id="logo" href="../../index.html"><span class="logo-mark">p5</span><span class="logo-word">.motion</span></a>
+  <div class="portal"><h3>Navigation</h3><ul>
+<li><a href="../../index.html">Main page</a></li>
+<li><a href="../../reference.html">Reference</a></li>
+<li><a href="../../examples.html">Examples</a></li>
+<li><a href="../../index.html#tuning">Tuning guide</a></li>
+<li><a href="../../index.html#troubleshooting">Troubleshooting</a></li>
+<li><a href="../../index.html#migrating-from-p5-vida">Migrating from p5.vida</a></li>
+  </ul></div>
+  <div class="portal"><h3>Version</h3><ul><li>0.1.0</li><li>p5.js 2.x (1.x compatible)</li></ul></div>
+</div>
+<div id="content">
+<h1 id="firstHeading">Swipe gestures</h1>
+<div class="siteSub">p5.motion example</div>
+<div class="hatnote">Part of the <a href="../../examples.html">p5.motion examples</a> · Category: Optical flow</div>
+<p>Detects left, right, up and down swipes from averageFlow(), with a short cooldown so one gesture fires once.</p>
+<div id="sketch-frame"><div id="sketch"></div>
+<div class="sketch-caption">Live sketch. Allow camera access when the browser asks. If nothing appears, see <a href="../../index.html#troubleshooting">Troubleshooting</a>.</div></div>
+<h2 id="source-code">Source code</h2>
+<p>Save as <code>sketch.js</code> next to an <code>index.html</code> that loads p5.js and <code>p5.motion.js</code> (see <a href="../../index.html#installation">Installation</a>).</p>
+<pre class="source">// averageFlow() averages every moving flow vector into one p5.Vector.
+let cam, motion;
+let smooth;
+let label = &#x27;&#x27;, labelTime = -1000, cooldownUntil = 0;
+
+function setup() {
+  createCanvas(640, 480);
+  cam = createCapture(VIDEO, { flipped: true });
+  cam.hide();
+  motion = createMotion(cam, { blobs: false });
+  smooth = createVector(0, 0);
+}
+
+function draw() {
+  image(cam, 0, 0, width, height);
+
+  smooth.lerp(motion.averageFlow(), 0.3);
+
+  if (millis() &gt; cooldownUntil &amp;&amp; smooth.mag() &gt; 6) {
+    if (abs(smooth.x) &gt; abs(smooth.y)) label = smooth.x &gt; 0 ? &#x27;RIGHT&#x27; : &#x27;LEFT&#x27;;
+    else label = smooth.y &gt; 0 ? &#x27;DOWN&#x27; : &#x27;UP&#x27;;
+    labelTime = millis();
+    cooldownUntil = millis() + 600;
+  }
+
+  // arrow for the current average
+  stroke(255, 220, 0);
+  strokeWeight(4);
+  line(width / 2, height / 2, width / 2 + smooth.x * 10, height / 2 + smooth.y * 10);
+
+  if (millis() - labelTime &lt; 800) {
+    noStroke();
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(64);
+    text(label, width / 2, 80);
+  }
+}
+</pre>
+<h2 id="used-in-this-example">Used in this example</h2>
+<p><a href="../../reference.html#ref-averageflow"><code>averageFlow</code></a>, <a href="../../reference.html#ref-createmotion"><code>createMotion()</code></a></p>
+<p class="pager">← <a href="../flow-particles/index.html">Flow particles</a> · <a href="../../examples.html">All examples</a> · <a href="../background-modes/index.html">Background modes</a> →</p>
+<div id="footer">p5.motion 0.1.0 · MIT License · Inspired by p5.vida by Paweł Janicki.</div>
+</div>
+</body>
+</html>

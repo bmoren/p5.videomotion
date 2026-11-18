@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>p5.motion — p5.motion</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<div id="side">
+  <a id="logo" href="index.html"><span class="logo-mark">p5</span><span class="logo-word">.motion</span></a>
+  <div class="portal"><h3>Navigation</h3><ul>
+<li class="active"><a href="index.html">Main page</a></li>
+<li><a href="reference.html">Reference</a></li>
+<li><a href="examples.html">Examples</a></li>
+<li><a href="index.html#tuning">Tuning guide</a></li>
+<li><a href="index.html#troubleshooting">Troubleshooting</a></li>
+<li><a href="index.html#migrating-from-p5-vida">Migrating from p5.vida</a></li>
+  </ul></div>
+  <div class="portal"><h3>Version</h3><ul><li>0.1.0</li><li>p5.js 2.x (1.x compatible)</li></ul></div>
+</div>
+<div id="content">
+<h1 id="firstHeading">p5.motion</h1>
+<div class="siteSub">From the p5.motion documentation, a camera motion tracking library for p5.js</div>
+<table class="infobox">
+<caption>p5.motion</caption>
+<tr><th>Type</th><td>p5.js add-on library</td></tr>
+<tr><th>Purpose</th><td>Camera motion tracking</td></tr>
+<tr><th>Version</th><td>0.1.0</td></tr>
+<tr><th>Requires</th><td>p5.js 2.x (also runs on 1.x)</td></tr>
+<tr><th>Features</th><td>Motion mask, blobs with tracking, active zones, optical flow</td></tr>
+<tr><th>Processing</th><td>CPU, single pass per frame</td></tr>
+<tr><th>Dependencies</th><td>None</td></tr>
+<tr><th>License</th><td>MIT</td></tr>
+<tr><th>Based on</th><td>Ideas from p5.vida by Paweł Janicki</td></tr>
+<tr><th>Docs</th><td><a href="reference.html">Reference</a> · <a href="examples.html">Examples</a></td></tr>
+</table>
+
+<p><b>p5.motion</b> is an add-on library for <a href="https://p5js.org">p5.js</a> that detects movement in a webcam or video image and turns it into values you can draw with. It finds <i>where</i> things move (a motion mask and tracked <a href="#blobs">blobs</a>), <i>whether</i> anything moves inside regions you define (<a href="#zones">zones</a>), and <i>which way and how fast</i> things move (<a href="#optical-flow">optical flow</a>).</p>
+
+<p>It is written for interactive installations, performances and teaching. Everything is reported in canvas pixels, it updates itself every frame, and it uses the same callback style as p5.js. It is a rewrite of the ideas in <a href="#migrating-from-p5-vida">p5.vida</a>: about four to five times faster, and with optical flow added.</p>
+
+<div class="toc" role="navigation"><div class="toctitle">Contents</div><ul><li><a href="#overview"><span class="tocnumber">1</span> Overview</a></li><li><a href="#installation"><span class="tocnumber">2</span> Installation</a><ul><li><a href="#serving-the-page"><span class="tocnumber">2.1</span> Serving the page</a></li><li><a href="#p5-js-versions"><span class="tocnumber">2.2</span> p5.js versions</a></li></ul></li><li><a href="#quick-start"><span class="tocnumber">3</span> Quick start</a></li><li><a href="#concepts"><span class="tocnumber">4</span> Concepts</a><ul><li><a href="#coordinates"><span class="tocnumber">4.1</span> Coordinates</a></li><li><a href="#how-a-frame-is-processed"><span class="tocnumber">4.2</span> How a frame is processed</a></li><li><a href="#background-models"><span class="tocnumber">4.3</span> Background models</a></li><li><a href="#blobs"><span class="tocnumber">4.4</span> Blobs</a></li><li><a href="#zones"><span class="tocnumber">4.5</span> Zones</a></li><li><a href="#optical-flow"><span class="tocnumber">4.6</span> Optical flow</a></li></ul></li><li><a href="#performance"><span class="tocnumber">5</span> Performance</a></li><li><a href="#tuning"><span class="tocnumber">6</span> Tuning guide</a></li><li><a href="#troubleshooting"><span class="tocnumber">7</span> Troubleshooting</a></li><li><a href="#migrating-from-p5-vida"><span class="tocnumber">8</span> Migrating from p5.vida</a></li><li><a href="#limitations"><span class="tocnumber">9</span> Limitations</a></li><li><a href="#future-directions"><span class="tocnumber">10</span> Future directions</a></li><li><a href="#see-also"><span class="tocnumber">11</span> See also</a></li></ul></div>
+<h2 id="overview">Overview</h2>
+<p>A sketch using p5.motion creates one <i>motion object</i> from a video source and reads results from it in <code>draw()</code>:</p>
+<ul>
+<li><b>Motion mask</b> — which pixels differ from the learned background (<a href="reference.html#ref-mask"><code>motion.mask</code></a>), and what fraction of the frame is moving (<a href="reference.html#ref-amount"><code>motion.amount</code></a>).</li>
+<li><b>Blobs</b> — connected regions of motion with bounding box, centre of mass, outline, velocity and a persistent id (<a href="reference.html#ref-blobs"><code>motion.blobs</code></a>).</li>
+<li><b>Zones</b> — rectangles that report how much of them is moving and fire events when they switch on and off (<a href="reference.html#ref-zone"><code>motion.zone()</code></a>).</li>
+<li><b>Optical flow</b> — a grid of motion vectors, readable at any point (<a href="reference.html#ref-flowat"><code>flowAt()</code></a>), as a whole-frame average (<a href="reference.html#ref-averageflow"><code>averageFlow()</code></a>), or per zone (<a href="reference.html#ref-flow"><code>zone.flow</code></a>).</li>
+<li><b>Debug view</b> — one call (<a href="reference.html#ref-debug"><code>motion.debug()</code></a>) draws all of the above over your sketch.</li>
+</ul>
+
+<h2 id="installation">Installation</h2>
+<p>Download <a href="lib/p5.motion.js"><code>p5.motion.js</code></a> and load it after p5.js:</p>
+<pre>&lt;script src="https://cdn.jsdelivr.net/npm/p5@2/lib/p5.min.js"&gt;&lt;/script&gt;
+&lt;script src="p5.motion.js"&gt;&lt;/script&gt;
+&lt;script src="sketch.js"&gt;&lt;/script&gt;</pre>
+<p>In the p5.js Web Editor, upload <code>p5.motion.js</code> to the sketch and add the second line to <code>index.html</code>.</p>
+
+<h3 id="serving-the-page">Serving the page</h3>
+<p>Browsers only allow camera access on pages served over <code>https://</code> or from <code>http://localhost</code>. Opening <code>index.html</code> straight from disk (<code>file://</code>) will not work. From the sketch's folder, run any small web server, for example:</p>
+<pre>npx serve
+# or
+python3 -m http.server 8000</pre>
+<p>then open the address it prints (for example <code>http://localhost:8000</code>).</p>
+
+<h3 id="p5-js-versions">p5.js versions</h3>
+<p>p5.motion is written for p5.js 2.x and registers itself with the 2.x add-on system. It also runs on p5.js 1.x (tested with 1.11), where it uses the older <i>pre</i>-draw hook. Older 1.x versions without <code>createCapture(VIDEO, { flipped: true })</code> can use the <code>flip: true</code> option instead, mirroring the drawn image themselves with <code>scale(-1, 1)</code>.</p>
+
+<h2 id="quick-start">Quick start</h2>
+<pre>let cam, motion;
+
+function setup() {
+  createCanvas(640, 480);
+  cam = createCapture(VIDEO, { flipped: true });   // mirror, like a mirror
+  cam.hide();
+
+  motion = createMotion(cam);                      // updates itself every frame
+
+  motion.zone('left', 40, 140, 160, 200)           // x, y, w, h in canvas pixels
+    .onEnter(z => console.log(z.id, 'ON'))
+    .onExit(z => console.log(z.id, 'OFF'));
+}
+
+function draw() {
+  image(cam, 0, 0, width, height);
+  motion.debug();                                  // see what is detected
+}</pre>
+<p>From here, read <a href="reference.html#ref-blobs"><code>motion.blobs</code></a>, <a href="reference.html#ref-zone"><code>zone.amount</code></a> or <a href="reference.html#ref-flowat"><code>motion.flowAt()</code></a> to drive your own drawing. The <a href="examples.html">examples</a> show each of these.</p>
+
+<h2 id="concepts">Concepts</h2>
+
+<h3 id="coordinates">Coordinates</h3>
+<p>Internally the camera image is shrunk to a small <i>processing resolution</i> (320 pixels wide by default), because motion analysis does not need full camera detail and every pixel costs time. You never deal with that resolution directly: everything you give p5.motion (zone rectangles, <code>flowAt()</code> positions) and everything it gives back (blob boxes, flow vectors) is in <b>canvas pixels</b>.</p>
+<p>By default the camera is assumed to cover the whole canvas, which matches <code>image(cam, 0, 0, width, height)</code>. If you draw it somewhere else, tell the tracker with <a href="reference.html#ref-mapto"><code>mapTo(x, y, w, h)</code></a> and all coordinates follow. Blobs also have normalized (0–1) coordinates if you need them independent of the canvas.</p>
+
+<h3 id="how-a-frame-is-processed">How a frame is processed</h3>
+<ol>
+<li>The source is drawn once into a small hidden canvas at processing resolution (mirrored if needed) and its pixels are read once.</li>
+<li>The pixels are converted to brightness (grayscale) and lightly blurred to remove camera noise.</li>
+<li>Each pixel is compared with the <a href="#background-models">background model</a>. Pixels that differ by more than <code>threshold</code> become motion. This is the <b>motion mask</b>.</li>
+<li>A running total of the mask (a <i>summed-area table</i>) is built, so the amount of motion in any rectangle can be found with four lookups. This is what makes zones cheap.</li>
+<li><a href="#blobs">Blobs</a> are found by grouping touching mask pixels, then matched with the previous frame's blobs.</li>
+<li><a href="#optical-flow">Optical flow</a> is measured on a grid by comparing this frame with the previous one.</li>
+<li><a href="#zones">Zones</a> are evaluated and their events fire.</li>
+</ol>
+
+<h3 id="background-models">Background models</h3>
+<p>Motion is anything that differs from the <i>background</i>, the tracker's idea of what the empty scene looks like. Choose with the <code>background</code> option:</p>
+<table class="wikitable">
+<tr><th>Mode</th><th>How the background is learned</th><th>Good for</th><th>Drawback</th></tr>
+<tr><td><code>'adaptive'</code> (default)</td><td>Continuously, blending a little of each new frame in (<code>adapt</code>).</td><td>Most installations. Follows slow lighting changes.</td><td>Someone who stands still slowly fades into the background.</td></tr>
+<tr><td><code>'static'</code></td><td>Once, from the first frame, or again after <a href="reference.html#ref-capturebackground"><code>captureBackground()</code></a>.</td><td>Controlled lighting where people may stand still: presence detection.</td><td>Any lighting change or camera bump shows up as motion until you relearn.</td></tr>
+<tr><td><code>'frame'</code></td><td>The previous frame is the background.</td><td>Pure movement: gestures, trails, flicker effects.</td><td>Still objects vanish instantly. Only edges of moving shapes show.</td></tr>
+</table>
+<p>The background is stored with full precision, so even slow, small brightness changes (dusk light, a cloud) are absorbed by the adaptive model instead of leaving stuck pixels.</p>
+
+<h3 id="blobs">Blobs</h3>
+<p>A blob is a group of touching motion pixels (diagonal neighbours count as touching). Blobs smaller than <code>minArea</code> are ignored, and only the <code>maxBlobs</code> largest are kept. Each blob is matched to the nearest blob of the previous frame within <code>trackDistance</code>, so its <code>id</code> stays the same as it moves. A blob that briefly disappears keeps its id for up to <code>lostFrames</code> frames. <a href="reference.html#ref-onblobenter"><code>onBlobEnter</code></a> and <a href="reference.html#ref-onblobexit"><code>onBlobExit</code></a> report blobs appearing and leaving.</p>
+<p>One person is not always one blob. Clothes that match the background can split a body into pieces, and two people standing close merge into one. Raising <code>minArea</code> removes small fragments.</p>
+
+<h3 id="zones">Zones</h3>
+<p>A zone measures the fraction of its area that is in the motion mask (<code>amount</code>). When that reaches the zone's <code>threshold</code> (2% by default) the zone becomes <code>active</code> and <code>onEnter</code> fires; when it drops below, <code>onExit</code> fires. Zones also report the average direction of movement inside them (<code>zone.flow</code>). Thanks to the summed-area table, a zone costs the same however large it is, so dozens of zones are fine.</p>
+
+<h3 id="optical-flow">Optical flow</h3>
+<p>Optical flow estimates how each part of the image moved between two frames. p5.motion uses the <i>Lucas–Kanade</i> method on a grid of points (every 8 processing pixels by default). For each point it finds the small shift that best lines up a patch of the previous frame with the current one. It works on an <i>image pyramid</i>: first on heavily shrunk copies of the frame to catch large movements, then on sharper copies to refine them. With the default 4 levels, movements of about 10 processing pixels per frame (roughly 20 canvas pixels on a 640-wide canvas) are measured accurately.</p>
+<p>Limits that come from the method itself:</p>
+<ul>
+<li><b>It needs texture.</b> A flat, single-coloured surface looks the same wherever it moves, so no motion can be measured there. Such patches are reported as zero (see <code>minTexture</code>). Faces, hands, clothing and hair have plenty of texture. Plain walls and dark areas do not.</li>
+<li><b>Edges are ambiguous along their length</b> (the <i>aperture problem</i>). A long straight edge sliding along itself shows no motion. Only movement across it is measured.</li>
+<li><b>Very fast motion</b> beyond the pyramid's range is underestimated. Add a <code>levels</code> or lower the resolution.</li>
+</ul>
+<p>By default flow is only measured where the motion mask shows movement (<code>maskOnly</code>), which saves time and stops still areas from jittering.</p>
+
+<h2 id="performance">Performance</h2>
+<p>Update time per frame for the same synthetic scene in Chrome, compared with p5.vida (converted to p5.js 2.x). The figures come from a headless test machine, so treat them as relative rather than absolute.</p>
+<table class="wikitable">
+<tr><th>Processing size</th><th>p5.vida</th><th>p5.motion</th><th>p5.motion + flow</th></tr>
+<tr><td>160 × 120</td><td>2.1 ms</td><td>0.7 ms</td><td>1.4 ms</td></tr>
+<tr><td>320 × 240 (default)</td><td>7.0 ms</td><td>1.6 ms</td><td>3.2 ms</td></tr>
+<tr><td>640 × 480</td><td>30.4 ms</td><td>6.2 ms</td><td>12.0 ms</td></tr>
+</table>
+<p>At 60 frames per second a whole frame has 16.7 ms. Ways to spend less:</p>
+<ul>
+<li>Lower <code>resolution</code>. Time scales with the number of pixels, so 160 is about four times cheaper than 320.</li>
+<li>Turn off what you do not use: <code>{ blobs: false }</code> or <code>{ flow: false }</code>.</li>
+<li>Use a larger flow <code>step</code> (for example 12 or 16).</li>
+<li>Use <code>autoUpdate: false</code> and call <a href="reference.html#ref-update"><code>update()</code></a> every second frame.</li>
+<li>Ask the camera for a smaller image: <code>cam.size(320, 240)</code>.</li>
+</ul>
+<p>Most of the remaining cost is reading the camera pixels back from the browser, which every CPU-based library has to do. See <a href="#future-directions">Future directions</a>.</p>
+
+<h2 id="tuning">Tuning guide</h2>
+<table class="wikitable">
+<tr><th>Symptom</th><th>Try</th></tr>
+<tr><td>Speckles of motion everywhere, zones trigger by themselves</td><td>Raise <code>threshold</code> (0.2–0.3). Keep <code>denoise</code> on. Give the room more light: cameras are noisy in the dark.</td></tr>
+<tr><td>Movement is missed, or only shows at the edges of people</td><td>Lower <code>threshold</code> (0.08–0.12). Increase contrast between people and background.</td></tr>
+<tr><td>People who stand still disappear</td><td>Lower <code>adapt</code> (0.01–0.02), or use <code>background: 'static'</code> and relearn the empty room with <code>captureBackground()</code>.</td></tr>
+<tr><td>Lighting changes cause a burst of motion</td><td>Raise <code>adapt</code> (0.1+) so the background catches up faster, or relearn when the lights change.</td></tr>
+<tr><td>Too many small blobs</td><td>Raise <code>minArea</code> (0.005–0.02) or lower <code>maxBlobs</code>.</td></tr>
+<tr><td>Blob ids keep changing</td><td>Raise <code>trackDistance</code> for fast motion. Raise <code>lostFrames</code> if blobs flicker.</td></tr>
+<tr><td>A zone flickers on and off</td><td>Raise its threshold with <code>setThreshold()</code>, or make it larger.</td></tr>
+<tr><td>Flow is jittery</td><td>Raise flow <code>smoothing</code> (0.7–0.9) or <code>minSpeed</code>.</td></tr>
+<tr><td>Flow misses fast gestures</td><td>Add pyramid <code>levels</code> (5), or lower <code>resolution</code>.</td></tr>
+<tr><td>Flow is zero in some areas</td><td>Those areas lack texture or are not in the motion mask. Lower <code>minTexture</code>, or set <code>maskOnly: false</code>.</td></tr>
+</table>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<dl>
+<dt>Nothing happens and there is no camera image</dt>
+<dd>The page must be served from <code>http://localhost</code> or <code>https://</code> (see <a href="#serving-the-page">Serving the page</a>), and you must allow camera access. Check the browser's address bar for a blocked-camera icon.</dd>
+<dt><code>createMotion is not defined</code></dt>
+<dd><code>p5.motion.js</code> did not load, or loaded before p5.js. Check the order of the <code>&lt;script&gt;</code> tags and the browser console for a 404.</dd>
+<dt>The mask, zones or blobs are mirrored relative to the image</dt>
+<dd>The tracker mirrors only when the capture was created with <code>{ flipped: true }</code>, or with the <code>flip</code> option. Make the image you draw and the tracker agree: draw the capture with <code>image()</code> (which respects <code>flipped</code>), or set <code>flip</code> explicitly.</dd>
+<dt>Zones and blobs are offset from the camera image</dt>
+<dd>The camera is drawn somewhere other than the full canvas. Call <a href="reference.html#ref-mapto"><code>motion.mapTo()</code></a> with the same rectangle you pass to <code>image()</code>.</dd>
+<dt>Everything is motion for the first moment</dt>
+<dd>The background is learned from the first frame, which some cameras deliver dark or out of focus. The adaptive model recovers in a second or two. With <code>'static'</code>, call <code>captureBackground()</code> once the camera has settled (for example, on a key press).</dd>
+<dt>The sketch is slow</dt>
+<dd>See <a href="#performance">Performance</a>. The single biggest factor is <code>resolution</code>.</dd>
+</dl>
+
+<h2 id="migrating-from-p5-vida">Migrating from p5.vida</h2>
+<p>p5.motion covers the same ground as p5.vida with a different API, so existing Vida sketches need small changes. The main differences: there is no <code>update()</code> call to make, coordinates are canvas pixels instead of normalized 0–1 values, and mirroring is handled by the capture itself.</p>
+<table class="wikitable">
+<tr><th>p5.vida</th><th>p5.motion</th></tr>
+<tr><td><code>vida = new Vida(this)</code></td><td><code>motion = createMotion(cam)</code></td></tr>
+<tr><td><code>vida.update(cam)</code> in <code>draw()</code></td><td>Automatic. Or <code>autoUpdate: false</code> and <code>motion.update()</code></td></tr>
+<tr><td><code>progressiveBackgroundFlag = true</code></td><td><code>background: 'adaptive'</code></td></tr>
+<tr><td><code>progressiveBackgroundFlag = false</code> + <code>setBackgroundImage(cam)</code></td><td><code>background: 'static'</code> + <code>captureBackground()</code></td></tr>
+<tr><td><code>imageFilterFeedback = 0.92</code></td><td><code>adapt: 0.08</code> (adapt = 1 − feedback)</td></tr>
+<tr><td><code>imageFilterThreshold</code></td><td><code>threshold</code> (scales differ; retune by eye)</td></tr>
+<tr><td><code>mirror = vida.MIRROR_HORIZONTAL</code></td><td><code>createCapture(VIDEO, { flipped: true })</code> or <code>flip: true</code></td></tr>
+<tr><td><code>handleBlobsFlag</code>, <code>trackBlobsFlag</code></td><td><code>blobs</code> option (tracking is always on)</td></tr>
+<tr><td><code>normMinBlobMass</code></td><td><code>minArea</code></td></tr>
+<tr><td><code>normMaxBlobArea</code>, <code>normMaxBlobMass</code></td><td>No option; filter <code>motion.blobs</code> by <code>b.area</code></td></tr>
+<tr><td><code>getBlobs()</code></td><td><code>motion.blobs</code></td></tr>
+<tr><td><code>blob.normRectX</code> … <code>normRectH</code></td><td><code>b.x</code>, <code>b.y</code>, <code>b.w</code>, <code>b.h</code> (canvas px) or <code>b.nx</code> … <code>b.nh</code></td></tr>
+<tr><td><code>blob.normMassCenterX/Y</code></td><td><code>b.cx</code>, <code>b.cy</code> or <code>b.ncx</code>, <code>b.ncy</code></td></tr>
+<tr><td><code>blob.approximatedPolygon</code></td><td><code>b.hull()</code> (convex outline)</td></tr>
+<tr><td><code>blob.isNewFlag</code></td><td><code>b.isNew</code>, or <code>onBlobEnter()</code></td></tr>
+<tr><td><code>addActiveZone(id, nx, ny, nw, nh, callback)</code></td><td><code>zone(id, x, y, w, h).onChange(callback)</code> (canvas pixels: multiply normalized values by <code>width</code> / <code>height</code>)</td></tr>
+<tr><td><code>zone.isMovementDetectedFlag</code></td><td><code>zone.active</code></td></tr>
+<tr><td><code>zone.normFillFactor</code></td><td><code>zone.amount</code>*</td></tr>
+<tr><td><code>zone.normFillThreshold</code></td><td><code>zone.threshold</code> / <code>setThreshold()</code>*</td></tr>
+<tr><td><code>drawBlobs()</code>, <code>drawActiveZones()</code></td><td><code>motion.debug()</code></td></tr>
+<tr><td><code>thresholdImage</code></td><td><code>motion.mask</code></td></tr>
+<tr><td>—</td><td>Optical flow: <code>flowAt()</code>, <code>averageFlow()</code>, <code>forEachFlow()</code>, <code>zone.flow</code></td></tr>
+</table>
+<p>* p5.vida divided a zone's motion pixel count by the zone's width <i>plus</i> its height instead of its area, so its fill factors were much larger than true fractions. Zone thresholds carried over from Vida sketches will need lowering.</p>
+
+<h2 id="limitations">Limitations</h2>
+<ul>
+<li>Background subtraction detects <i>change</i>, not people. Shadows, reflections, screens and moving projections in view all count as motion.</li>
+<li>All processing runs on the main thread. Very high resolutions compete with your drawing for time.</li>
+<li>Blob outlines are convex hulls, so concave shapes (an arm held out from the body) are filled in.</li>
+<li>Only one horizontal mirror option. Rotate or flip other ways by drawing the source into a <code>p5.Graphics</code> first.</li>
+</ul>
+
+<h2 id="future-directions">Future directions</h2>
+<p>p5.js 2.x is adding GPU features that could take most of this work off the CPU: filter shaders written in JavaScript (<i>p5.strands</i>), and an experimental WebGPU mode with compute shaders. The background model, the motion mask and optical flow all suit the GPU. Blob grouping does not, and would still need a small mask read back. Machine-learning person segmentation (for example MediaPipe) is a different way to answer "is someone there?" that ignores lighting changes and still people, at the cost of a model download and more GPU time.</p>
+
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="reference.html">p5.motion reference</a></li>
+<li><a href="examples.html">p5.motion examples</a> (15 sketches)</li>
+<li><a href="https://p5js.org/reference/p5/createCapture/">createCapture()</a> in the p5.js reference</li>
+<li><a href="https://tetoki.eu/vida">p5.vida</a> by Paweł Janicki, the library that inspired this one</li>
+<li><a href="https://en.wikipedia.org/wiki/Lucas%E2%80%93Kanade_method">Lucas–Kanade method</a> and <a href="https://en.wikipedia.org/wiki/Summed-area_table">Summed-area table</a> on Wikipedia</li>
+</ul>
+
+<div id="footer">p5.motion 0.1.0 · MIT License · Inspired by p5.vida by Paweł Janicki.</div>
+</div>
+</body>
+</html>

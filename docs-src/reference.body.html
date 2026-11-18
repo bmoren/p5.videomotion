@@ -1,0 +1,255 @@
+<div class="hatnote">For an introduction, see the <a href="index.html">main page</a>. For runnable sketches, see <a href="examples.html">Examples</a>.</div>
+
+<p>This page documents everything p5.motion adds to p5.js: the <a href="#ref-createmotion"><code>createMotion()</code></a> function, its <a href="#options">options</a>, and the three kinds of object it gives you — the <a href="#the-motion-object">motion object</a>, <a href="#zones">zones</a> and <a href="#blobs">blobs</a>.</p>
+
+<p>Unless stated otherwise, every position, size, distance and speed is in <b>canvas pixels</b> (speeds are canvas pixels per frame), measured against the area the camera is mapped to (the whole canvas by default; see <a href="#ref-mapto"><code>mapTo()</code></a>). Values described as <i>fractions</i> run from 0 to 1.</p>
+
+<h2>createMotion()</h2>
+
+<div class="entry">
+<h3 id="ref-createmotion">createMotion(source, [options])</h3>
+<p>Creates a motion tracker that watches <var>source</var> and returns it. By default the tracker updates itself just before every <code>draw()</code>, so you only create it once in <code>setup()</code>.</p>
+<div class="sig">createMotion(source)<br>createMotion(source, options)</div>
+<dl>
+<dt>Parameters</dt>
+<dd><code>source</code> — what to watch. Any of: a capture from <code>createCapture(VIDEO)</code>, a video from <code>createVideo()</code>, a <code>p5.Graphics</code>, a <code>p5.Image</code>, or an HTML <code>&lt;video&gt;</code>, <code>&lt;canvas&gt;</code> or <code>&lt;img&gt;</code> element.</dd>
+<dd><code>options</code> — <i>optional</i> object; see <a href="#options">Options</a>.</dd>
+<dt>Returns</dt>
+<dd>A <a href="#the-motion-object">motion object</a> (<code>p5.MotionTracker</code>).</dd>
+</dl>
+<pre>let cam, motion;
+
+function setup() {
+  createCanvas(640, 480);
+  cam = createCapture(VIDEO, { flipped: true });
+  cam.hide();
+  motion = createMotion(cam, { resolution: 240, threshold: 0.2 });
+}</pre>
+<p>In instance mode call it as <code>p.createMotion(...)</code>. You can create several trackers in one sketch, each with its own source and options.</p>
+</div>
+
+<h2>Options</h2>
+
+<p>Pass these to <code>createMotion()</code>, or change them later with <a href="#ref-set"><code>motion.set()</code></a>. Every option is optional.</p>
+
+<table class="wikitable">
+<tr><th>Option</th><th>Default</th><th>Description</th></tr>
+<tr><td><code>resolution</code></td><td>320</td><td>Width in pixels that the source is scaled down to before processing. The height follows the source's aspect ratio. It is never larger than the source itself. Halving it makes processing roughly four times faster. Changing it relearns the background.</td></tr>
+<tr><td><code>background</code></td><td><code>'adaptive'</code></td><td>How the empty scene is modelled. <code>'adaptive'</code> learns it continuously; <code>'static'</code> learns it once (relearn with <a href="#ref-capturebackground"><code>captureBackground()</code></a>); <code>'frame'</code> compares each frame with the one before. See <a href="index.html#background-models">Background models</a>.</td></tr>
+<tr><td><code>adapt</code></td><td>0.05</td><td>Learning speed of the <code>'adaptive'</code> background, 0–1. Each frame the background moves this fraction of the way toward the current image. Higher values follow lighting changes faster, but people who stand still also fade into the background sooner.</td></tr>
+<tr><td><code>threshold</code></td><td>0.15</td><td>How different a pixel's brightness must be from the background to count as motion, as a fraction of the full brightness range (0.15 ≈ 38 of 255 levels).</td></tr>
+<tr><td><code>denoise</code></td><td><code>true</code></td><td>Applies a light 3×3 blur before processing, which removes most camera noise speckle.</td></tr>
+<tr><td><code>blobs</code></td><td><code>true</code></td><td>Detects and tracks <a href="#blobs">blobs</a>. Turn off to save time when you only use zones or flow.</td></tr>
+<tr><td><code>minArea</code></td><td>0.002</td><td>Smallest blob kept, as a fraction of all the pixels in the frame (0.002 at 320×240 is about 150 pixels).</td></tr>
+<tr><td><code>maxBlobs</code></td><td>16</td><td>Keep at most this many blobs, largest first.</td></tr>
+<tr><td><code>trackDistance</code></td><td>0.15</td><td>The furthest a blob's centre may move between frames and still keep its id, as a fraction of the frame width.</td></tr>
+<tr><td><code>lostFrames</code></td><td>3</td><td>How many frames a blob may disappear for (for example, when someone briefly holds still) before it counts as gone and <a href="#ref-onblobexit"><code>onBlobExit</code></a> fires.</td></tr>
+<tr><td><code>flow</code></td><td><code>true</code></td><td>Optical flow. <code>true</code> or <code>false</code>, or an object of <a href="#flow-options">flow options</a> (which also turns it on).</td></tr>
+<tr><td><code>flip</code></td><td><i>automatic</i></td><td>Mirror the source horizontally. By default this follows the capture's own setting: a capture made with <code>{ flipped: true }</code> is processed mirrored, so the analysis lines up with what <code>image(cam, …)</code> draws.</td></tr>
+<tr><td><code>autoUpdate</code></td><td><code>true</code></td><td>Update automatically before each <code>draw()</code>. Set to <code>false</code> to call <a href="#ref-update"><code>update()</code></a> yourself.</td></tr>
+</table>
+
+<h3 id="flow-options">Flow options</h3>
+<p>Given as an object: <code>createMotion(cam, { flow: { step: 12, smoothing: 0.7 } })</code>. Unlisted values keep their defaults.</p>
+<table class="wikitable">
+<tr><th>Option</th><th>Default</th><th>Description</th></tr>
+<tr><td><code>step</code></td><td>8</td><td>Spacing of the flow grid, in processing pixels. At the default 320 resolution this gives a 40×30 grid. Larger steps are faster and coarser.</td></tr>
+<tr><td><code>window</code></td><td>4</td><td>Radius of the patch compared around each grid point (4 means 9×9 pixels). Larger windows are steadier but blur the edges of motion.</td></tr>
+<tr><td><code>levels</code></td><td>4</td><td>Number of image pyramid levels. Each level doubles the speed that can be measured. With 4 levels, motion of about 10 processing pixels per frame is measured accurately.</td></tr>
+<tr><td><code>iterations</code></td><td>3</td><td>Refinement steps per level.</td></tr>
+<tr><td><code>smoothing</code></td><td>0.5</td><td>Smoothing over time, 0–0.99. 0 uses each frame's measurement as is; higher values are steadier but react later.</td></tr>
+<tr><td><code>minSpeed</code></td><td>0.3</td><td>Vectors slower than this (canvas pixels per frame) are ignored by <a href="#ref-averageflow"><code>averageFlow()</code></a>, <a href="#ref-flow"><code>zone.flow</code></a> and <a href="#ref-debug"><code>debug()</code></a>. Does not affect <code>flowAt()</code> or <code>forEachFlow()</code>.</td></tr>
+<tr><td><code>minTexture</code></td><td>4</td><td>How much detail a patch needs before its motion is trusted (average brightness change per pixel). Flat, single-coloured areas give no reliable flow and are reported as zero.</td></tr>
+<tr><td><code>maskOnly</code></td><td><code>true</code></td><td>Only measure flow near pixels that the <a href="#ref-mask">motion mask</a> marks as moving. Everywhere else is zero. Saves time and removes jitter in still areas.</td></tr>
+</table>
+
+<h2>The motion object</h2>
+<p>The object returned by <code>createMotion()</code>, an instance of <code>p5.MotionTracker</code>.</p>
+
+<h3>Properties</h3>
+<table class="wikitable">
+<tr><th>Property</th><th>Type</th><th>Description</th></tr>
+<tr><td id="ref-ready"><code>ready</code></td><td>Boolean</td><td><code>true</code> once the source delivers frames and the latest update succeeded. Before that, the other values are empty or zero.</td></tr>
+<tr><td id="ref-amount"><code>amount</code></td><td>Number</td><td>Fraction of the whole frame that is moving, 0–1.</td></tr>
+<tr><td id="ref-blobs"><code>blobs</code></td><td>Array</td><td>The <a href="#blobs">blobs</a> found in the current frame, largest first. Blobs in their <code>lostFrames</code> grace period are not included.</td></tr>
+<tr><td id="ref-zones"><code>zones</code></td><td>Array</td><td>All <a href="#zones">zones</a>, in the order they were added.</td></tr>
+<tr><td id="ref-mask"><code>mask</code></td><td>p5.Image</td><td>The motion mask: white where there is motion, black elsewhere, at processing resolution. Built on first access each frame, so it costs nothing if unused. <code>null</code> before the first frame.</td></tr>
+<tr><td><code>width</code>, <code>height</code></td><td>Number</td><td>Processing resolution in pixels.</td></tr>
+<tr><td><code>frame</code></td><td>Number</td><td>Number of frames processed so far.</td></tr>
+<tr><td><code>options</code>, <code>flowOptions</code></td><td>Object</td><td>Current settings (read only; change them with <a href="#ref-set"><code>set()</code></a>).</td></tr>
+<tr><td><code>source</code></td><td>—</td><td>The source being watched. You can assign a new one; processing resizes if needed.</td></tr>
+</table>
+
+<h3>Methods</h3>
+
+<div class="entry">
+<h4 id="ref-zone">zone(id, x, y, w, h)</h4>
+<p>Adds a rectangular <a href="#zones">zone</a> and returns it, so calls can be chained. A zone with the same id is replaced.</p>
+<dl><dt>Parameters</dt>
+<dd><code>id</code> — any string or number, used to find the zone again.</dd>
+<dd><code>x</code>, <code>y</code>, <code>w</code>, <code>h</code> — the rectangle in canvas pixels.</dd>
+<dt>Returns</dt><dd>The zone (<code>p5.MotionZone</code>).</dd></dl>
+<pre>motion.zone('door', 500, 100, 120, 300)
+  .setThreshold(0.05)
+  .onEnter(z => console.log('someone at the door'));</pre>
+</div>
+
+<div class="entry">
+<h4 id="ref-getzone">getZone(id)</h4>
+<p>Returns the zone with that id, or <code>null</code>.</p>
+</div>
+
+<div class="entry">
+<h4 id="ref-removezone">removeZone(id)</h4>
+<p>Removes the zone with that id. Returns the motion object.</p>
+</div>
+
+<div class="entry">
+<h4 id="ref-flowat">flowAt(x, y)</h4>
+<p>Returns the motion at a canvas position as a <code>p5.Vector</code>, in canvas pixels per frame, interpolated smoothly between flow grid points. Returns <code>(0, 0)</code> when flow is off or the tracker is not ready.</p>
+<pre>let v = motion.flowAt(mouseX, mouseY);
+line(mouseX, mouseY, mouseX + v.x * 5, mouseY + v.y * 5);</pre>
+</div>
+
+<div class="entry">
+<h4 id="ref-averageflow">averageFlow()</h4>
+<p>Returns the average of all flow vectors faster than <code>minSpeed</code> as a <code>p5.Vector</code>, or <code>(0, 0)</code> if nothing is moving. Good for overall gestures such as swipes.</p>
+</div>
+
+<div class="entry">
+<h4 id="ref-foreachflow">forEachFlow(callback)</h4>
+<p>Calls <code>callback(x, y, vx, vy)</code> once for every point on the flow grid, including still ones (where <code>vx</code> and <code>vy</code> are 0). <code>x</code>, <code>y</code> is the grid point and <code>vx</code>, <code>vy</code> its motion, all in canvas pixels. Uses plain numbers instead of vectors, so it is cheap to call every frame. Returns the motion object.</p>
+<pre>motion.forEachFlow((x, y, vx, vy) => {
+  if (vx * vx + vy * vy > 1) line(x, y, x + vx * 4, y + vy * 4);
+});</pre>
+</div>
+
+<div class="entry">
+<h4 id="ref-onblobenter">onBlobEnter(callback)</h4>
+<p>Calls <code>callback(blob)</code> once for each new blob, in the frame it first appears. Returns the motion object. Can be called several times to add several callbacks.</p>
+</div>
+
+<div class="entry">
+<h4 id="ref-onblobexit">onBlobExit(callback)</h4>
+<p>Calls <code>callback(blob)</code> when a blob has been missing for more than <code>lostFrames</code> frames. The blob passed in still holds its last known position, id and age. Returns the motion object.</p>
+</div>
+
+<div class="entry">
+<h4 id="ref-capturebackground">captureBackground()</h4>
+<p>Relearns the background from the next frame. Use with <code>background: 'static'</code> when the scene is empty, or after the camera or lighting changes. Returns the motion object.</p>
+</div>
+
+<div class="entry">
+<h4 id="ref-mapto">mapTo(x, y, w, h)</h4>
+<p>Tells the tracker where the camera image is drawn on the canvas, so that zones, blobs and flow use matching canvas coordinates. Call with no arguments to go back to the default (the whole canvas, following any resize). Returns the motion object.</p>
+<pre>image(cam, 20, 20, 320, 240);
+motion.mapTo(20, 20, 320, 240);   // usually once, in setup()</pre>
+</div>
+
+<div class="entry">
+<h4 id="ref-set">set(options)</h4>
+<p>Changes <a href="#options">options</a> while the sketch runs. Only the options given change. Takes effect at the next update. Changing <code>resolution</code> relearns the background, and changing flow <code>levels</code> or <code>step</code> restarts the flow measurement. Returns the motion object.</p>
+<pre>motion.set({ threshold: 0.25, flow: { smoothing: 0.8 } });</pre>
+</div>
+
+<div class="entry">
+<h4 id="ref-update">update()</h4>
+<p>Processes one frame from the source. Only needed with <code>autoUpdate: false</code>. Calling it while <code>autoUpdate</code> is on processes the frame twice. Returns <code>true</code> if a frame was processed, <code>false</code> if the source is not ready yet.</p>
+<pre>// update every other frame to save time
+if (frameCount % 2 === 0) motion.update();</pre>
+</div>
+
+<div class="entry">
+<h4 id="ref-debug">debug([options])</h4>
+<p>Draws what the tracker sees on top of your sketch: the motion mask in pink, flow vectors in yellow, blobs in green and zones in white (red when active). Draw it after the camera image. Does not change your fill, stroke or other drawing settings. Returns the motion object.</p>
+<dl><dt>Parameters</dt>
+<dd><code>options</code> — <i>optional</i>; turn layers off with <code>{ mask: false, zones: false, blobs: false, flow: false }</code>.</dd></dl>
+</div>
+
+<div class="entry">
+<h4 id="ref-remove">remove()</h4>
+<p>Stops automatic updates for this tracker. The object keeps its last results.</p>
+</div>
+
+<h2>Zones</h2>
+<p>A zone is a rectangle on the canvas that reports how much motion is inside it. Create zones with <a href="#ref-zone"><code>motion.zone()</code></a>. Each one is a <code>p5.MotionZone</code>. Checking a zone costs the same however large it is, so you can use many.</p>
+
+<h3>Zone properties</h3>
+<table class="wikitable">
+<tr><th>Property</th><th>Type</th><th>Description</th></tr>
+<tr><td><code>id</code></td><td>String / Number</td><td>The id given when the zone was created.</td></tr>
+<tr><td><code>x</code>, <code>y</code>, <code>w</code>, <code>h</code></td><td>Number</td><td>The rectangle in canvas pixels. You can change them directly, or use <a href="#ref-moveto"><code>moveTo()</code></a>.</td></tr>
+<tr><td id="ref-zone-amount"><code>amount</code></td><td>Number</td><td>Fraction of the zone that is moving, 0–1.</td></tr>
+<tr><td><code>active</code></td><td>Boolean</td><td><code>true</code> while <code>amount</code> is at or above <code>threshold</code>.</td></tr>
+<tr><td><code>threshold</code></td><td>Number</td><td>The amount at which the zone becomes active. Default 0.02 (2% of the zone).</td></tr>
+<tr><td id="ref-flow"><code>flow</code></td><td>p5.Vector</td><td>Average direction of movement inside the zone, from the flow vectors faster than <code>minSpeed</code>, in canvas pixels per frame. <code>(0, 0)</code> if flow is off. Each read returns a new vector, so it is safe to change.</td></tr>
+</table>
+
+<h3>Zone methods</h3>
+
+<div class="entry">
+<h4 id="ref-onenter">onEnter(callback)</h4>
+<p>Calls <code>callback(zone)</code> when the zone becomes active. Returns the zone.</p>
+</div>
+<div class="entry">
+<h4 id="ref-onexit">onExit(callback)</h4>
+<p>Calls <code>callback(zone)</code> when the zone stops being active. Returns the zone.</p>
+</div>
+<div class="entry">
+<h4 id="ref-onchange">onChange(callback)</h4>
+<p>Calls <code>callback(zone)</code> on every change, in either direction (after any <code>onEnter</code> or <code>onExit</code> callbacks). Check <code>zone.active</code> to see which way it went. Returns the zone.</p>
+</div>
+<div class="entry">
+<h4 id="ref-setthreshold">setThreshold(t)</h4>
+<p>Sets <code>threshold</code>. Returns the zone.</p>
+</div>
+<div class="entry">
+<h4 id="ref-moveto">moveTo(x, y, [w], [h])</h4>
+<p>Moves the zone, and optionally resizes it. Returns the zone.</p>
+</div>
+<div class="entry">
+<h4>contains(x, y)</h4>
+<p>Returns <code>true</code> if the canvas point is inside the zone.</p>
+</div>
+<div class="entry">
+<h4>remove()</h4>
+<p>Removes the zone from its motion object.</p>
+</div>
+
+<h2>Blobs</h2>
+<p>A blob is one connected region of motion, such as a person or a hand. Blobs are tracked from frame to frame, so a blob keeps its <code>id</code> while it moves. Read them from <a href="#ref-blobs"><code>motion.blobs</code></a>. Each one is a <code>p5.MotionBlob</code>.</p>
+
+<table class="wikitable">
+<tr><th>Property / method</th><th>Type</th><th>Description</th></tr>
+<tr><td><code>id</code></td><td>Number</td><td>Unique number that stays the same while the blob is tracked. Ids are never reused.</td></tr>
+<tr><td><code>age</code></td><td>Number</td><td>Frames tracked since the blob appeared (0 in its first frame).</td></tr>
+<tr><td><code>isNew</code></td><td>Boolean</td><td><code>true</code> only in the blob's first frame.</td></tr>
+<tr><td><code>x</code>, <code>y</code>, <code>w</code>, <code>h</code></td><td>Number</td><td>Bounding box in canvas pixels.</td></tr>
+<tr><td><code>cx</code>, <code>cy</code></td><td>Number</td><td>Centre of mass (the average position of its pixels) in canvas pixels. Steadier than the centre of the box.</td></tr>
+<tr><td><code>area</code></td><td>Number</td><td>Size as a fraction of the frame, 0–1.</td></tr>
+<tr><td id="ref-velocity"><code>velocity</code></td><td>p5.Vector</td><td>How far the centre of mass moved since the blob was last seen, in canvas pixels (per frame, unless the blob was briefly lost).</td></tr>
+<tr><td id="ref-hull"><code>hull()</code></td><td>Array of p5.Vector</td><td>The blob's outline as a convex hull, in canvas pixels, ready for <code>beginShape()</code> / <code>vertex()</code>. Only valid in the frame the blob was found (call it from <code>draw()</code>). Computed on demand and cached for the frame.</td></tr>
+<tr><td><code>nx</code>, <code>ny</code>, <code>nw</code>, <code>nh</code>, <code>ncx</code>, <code>ncy</code></td><td>Number</td><td>The same box and centre as fractions (0–1) of the camera frame, independent of where it is drawn.</td></tr>
+</table>
+<pre>for (let b of motion.blobs) {
+  beginShape();
+  for (let v of b.hull()) vertex(v.x, v.y);
+  endShape(CLOSE);
+  text('#' + b.id, b.cx, b.cy);
+}</pre>
+
+<h2>Timing and update order</h2>
+<p>p5.motion registers a p5 <i>predraw</i> hook (on p5.js 1.x it uses the equivalent <i>pre</i> hook). Each frame, in order:</p>
+<ol>
+<li>Every motion object with <code>autoUpdate</code> on processes the current source image.</li>
+<li>During that update, blob and zone callbacks fire (<code>onBlobEnter</code>, <code>onBlobExit</code>, <code>onEnter</code>, <code>onExit</code>, <code>onChange</code>).</li>
+<li>Your <code>draw()</code> runs and reads the fresh results.</li>
+</ol>
+<p>If your source is something you draw yourself (a <code>p5.Graphics</code>), what you draw during <code>draw()</code> is processed at the start of the next frame.</p>
+
+<h2>Globals added to p5</h2>
+<table class="wikitable">
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td><code>createMotion()</code></td><td>Added to every sketch (global and instance mode).</td></tr>
+<tr><td><code>p5.MotionTracker</code>, <code>p5.MotionZone</code>, <code>p5.MotionBlob</code></td><td>The classes, exposed for <code>instanceof</code> checks or extending with your own methods. Create trackers with <code>createMotion()</code> rather than calling these constructors.</td></tr>
+</table>

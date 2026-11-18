@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Background modes — p5.motion</title>
+<link rel="stylesheet" href="../../style.css">
+<script src="https://cdn.jsdelivr.net/npm/p5@2/lib/p5.min.js"></script>
+<script src="../../lib/p5.motion.js"></script>
+<script src="../example-page.js" defer></script>
+<script src="sketch.js" defer></script>
+</head>
+<body>
+<div id="side">
+  <a id="logo" href="../../index.html"><span class="logo-mark">p5</span><span class="logo-word">.motion</span></a>
+  <div class="portal"><h3>Navigation</h3><ul>
+<li><a href="../../index.html">Main page</a></li>
+<li><a href="../../reference.html">Reference</a></li>
+<li><a href="../../examples.html">Examples</a></li>
+<li><a href="../../index.html#tuning">Tuning guide</a></li>
+<li><a href="../../index.html#troubleshooting">Troubleshooting</a></li>
+<li><a href="../../index.html#migrating-from-p5-vida">Migrating from p5.vida</a></li>
+  </ul></div>
+  <div class="portal"><h3>Version</h3><ul><li>0.1.0</li><li>p5.js 2.x (1.x compatible)</li></ul></div>
+</div>
+<div id="content">
+<h1 id="firstHeading">Background modes</h1>
+<div class="siteSub">p5.motion example</div>
+<div class="hatnote">Part of the <a href="../../examples.html">p5.motion examples</a> · Category: Background and mask</div>
+<p>Camera on the left, motion mask on the right. Switch modes with 1 (adaptive), 2 (static) and 3 (frame), relearn with SPACE, and change the threshold with + and -.</p>
+<div id="sketch-frame"><div id="sketch"></div>
+<div class="sketch-caption">Live sketch. Allow camera access when the browser asks. If nothing appears, see <a href="../../index.html#troubleshooting">Troubleshooting</a>.</div></div>
+<h2 id="source-code">Source code</h2>
+<p>Save as <code>sketch.js</code> next to an <code>index.html</code> that loads p5.js and <code>p5.motion.js</code> (see <a href="../../index.html#installation">Installation</a>).</p>
+<pre class="source">// Compare the three background models side by side.
+let cam, motion;
+let mode = &#x27;adaptive&#x27;;
+
+function setup() {
+  createCanvas(640, 300);
+  cam = createCapture(VIDEO, { flipped: true });
+  cam.hide();
+  motion = createMotion(cam, { flow: false }).mapTo(0, 0, 320, 240);
+}
+
+function draw() {
+  background(30);
+  image(cam, 0, 0, 320, 240);
+  if (motion.ready) image(motion.mask, 320, 0, 320, 240);
+
+  fill(255);
+  noStroke();
+  textSize(13);
+  text(&#x27;mode: &#x27; + mode + &#x27;    threshold: &#x27; + motion.options.threshold.toFixed(2) +
+       &#x27;    moving: &#x27; + (motion.amount * 100).toFixed(1) + &#x27;%&#x27;, 10, 262);
+  text(&#x27;1 adaptive   2 static   3 frame   SPACE relearn   + / - threshold&#x27;, 10, 284);
+}
+
+function keyPressed() {
+  if (key === &#x27;1&#x27;) mode = &#x27;adaptive&#x27;;
+  if (key === &#x27;2&#x27;) mode = &#x27;static&#x27;;
+  if (key === &#x27;3&#x27;) mode = &#x27;frame&#x27;;
+  if (&#x27;123&#x27;.includes(key)) motion.set({ background: mode }).captureBackground();
+  if (key === &#x27; &#x27;) motion.captureBackground();
+  if (key === &#x27;+&#x27; || key === &#x27;=&#x27;) motion.set({ threshold: min(motion.options.threshold + 0.02, 1) });
+  if (key === &#x27;-&#x27;) motion.set({ threshold: max(motion.options.threshold - 0.02, 0.02) });
+}
+</pre>
+<h2 id="used-in-this-example">Used in this example</h2>
+<p><a href="../../reference.html#ref-capturebackground"><code>captureBackground</code></a>, <a href="../../reference.html#ref-createmotion"><code>createMotion()</code></a>, <a href="../../reference.html#ref-mask"><code>mask</code></a>, <a href="../../reference.html#ref-amount"><code>motion.amount</code></a>, <a href="../../reference.html#ref-ready"><code>ready</code></a>, <a href="../../reference.html#ref-set"><code>set</code></a></p>
+<p class="pager">← <a href="../swipe/index.html">Swipe gestures</a> · <a href="../../examples.html">All examples</a> · <a href="../mask-ghosts/index.html">Mask ghosts</a> →</p>
+<div id="footer">p5.motion 0.1.0 · MIT License · Inspired by p5.vida by Paweł Janicki.</div>
+</div>
+</body>
+</html>

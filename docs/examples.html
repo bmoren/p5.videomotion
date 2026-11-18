@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Examples — p5.motion</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<div id="side">
+  <a id="logo" href="index.html"><span class="logo-mark">p5</span><span class="logo-word">.motion</span></a>
+  <div class="portal"><h3>Navigation</h3><ul>
+<li><a href="index.html">Main page</a></li>
+<li><a href="reference.html">Reference</a></li>
+<li class="active"><a href="examples.html">Examples</a></li>
+<li><a href="index.html#tuning">Tuning guide</a></li>
+<li><a href="index.html#troubleshooting">Troubleshooting</a></li>
+<li><a href="index.html#migrating-from-p5-vida">Migrating from p5.vida</a></li>
+  </ul></div>
+  <div class="portal"><h3>Version</h3><ul><li>0.1.0</li><li>p5.js 2.x (1.x compatible)</li></ul></div>
+</div>
+<div id="content">
+<h1 id="firstHeading">Examples</h1>
+<div class="siteSub">From the p5.motion documentation</div>
+<p>These 15 sketches each show one part of p5.motion. Every page runs the sketch live
+and lists its full source. All of them use the webcam except <a href="examples/no-camera/index.html">Without a camera</a>.</p>
+<p>The examples load p5.js from a CDN, and browsers only give pages camera access over <code>https://</code> or
+<code>http://localhost</code>. Serve this folder with a local web server (see <a href="index.html#installation">Installation</a>)
+rather than opening the files directly.</p>
+<div class="toc" role="navigation"><div class="toctitle">Contents</div><ul><li><a href="#basics"><span class="tocnumber">1</span> Basics</a></li><li><a href="#zones"><span class="tocnumber">2</span> Zones</a></li><li><a href="#blobs"><span class="tocnumber">3</span> Blobs</a></li><li><a href="#optical-flow"><span class="tocnumber">4</span> Optical flow</a></li><li><a href="#background-and-mask"><span class="tocnumber">5</span> Background and mask</a></li><li><a href="#performance"><span class="tocnumber">6</span> Performance</a></li></ul></div>
+<h2 id="basics">Basics</h2>
+<table class="wikitable examples"><tr><th>Example</th><th>Description</th></tr>
+<tr><td><a href="examples/starter/index.html">Starter</a></td><td>The smallest useful sketch: webcam, adaptive background, two zones and the debug overlay.</td></tr>
+<tr><td><a href="examples/no-camera/index.html">Without a camera</a></td><td>Uses a p5.Graphics with moving shapes as the source. Useful for testing and for sketches where the input is generated or loaded rather than filmed.</td></tr>
+<tr><td><a href="examples/instance-mode/index.html">Instance mode</a></td><td>The same starter written in p5 instance mode. createMotion is available on the instance as p.createMotion.</td></tr>
+<tr><td><a href="examples/map-to/index.html">Camera in part of the canvas</a></td><td>Draws the camera into a smaller frame and uses mapTo() so zones and blobs stay in canvas pixels that line up with it.</td></tr>
+</table>
+<h2 id="zones">Zones</h2>
+<table class="wikitable examples"><tr><th>Example</th><th>Description</th></tr>
+<tr><td><a href="examples/zone-pads/index.html">Zone pads</a></td><td>Four zones along the top of the screen act like buttons. Each one flashes and counts when motion enters it.</td></tr>
+<tr><td><a href="examples/zone-meter/index.html">Zone meter and threshold</a></td><td>Shows a zone&#x27;s amount as a live meter next to its threshold. Press UP and DOWN to change the threshold and see when the zone switches.</td></tr>
+<tr><td><a href="examples/zone-flow/index.html">Direction inside zones</a></td><td>A grid of zones, each drawing an arrow for the average direction of movement inside it (zone.flow).</td></tr>
+</table>
+<h2 id="blobs">Blobs</h2>
+<table class="wikitable examples"><tr><th>Example</th><th>Description</th></tr>
+<tr><td><a href="examples/blobs/index.html">Drawing blobs</a></td><td>Draws each blob&#x27;s convex hull, centre of mass, id and velocity yourself instead of using debug().</td></tr>
+<tr><td><a href="examples/blob-trails/index.html">Blob trails and events</a></td><td>Keeps a trail for each blob by its id, using onBlobEnter and onBlobExit to create and clean up the trails.</td></tr>
+</table>
+<h2 id="optical-flow">Optical flow</h2>
+<table class="wikitable examples"><tr><th>Example</th><th>Description</th></tr>
+<tr><td><a href="examples/flow-field/index.html">Flow field</a></td><td>Draws every vector of the optical flow grid with forEachFlow(), coloured by direction.</td></tr>
+<tr><td><a href="examples/flow-particles/index.html">Flow particles</a></td><td>1,500 particles pushed around by motion.flowAt(). Wave your hands to sweep them.</td></tr>
+<tr><td><a href="examples/swipe/index.html">Swipe gestures</a></td><td>Detects left, right, up and down swipes from averageFlow(), with a short cooldown so one gesture fires once.</td></tr>
+</table>
+<h2 id="background-and-mask">Background and mask</h2>
+<table class="wikitable examples"><tr><th>Example</th><th>Description</th></tr>
+<tr><td><a href="examples/background-modes/index.html">Background modes</a></td><td>Camera on the left, motion mask on the right. Switch modes with 1 (adaptive), 2 (static) and 3 (frame), relearn with SPACE, and change the threshold with + and -.</td></tr>
+<tr><td><a href="examples/mask-ghosts/index.html">Mask ghosts</a></td><td>Uses motion.mask as an image: moving areas are added onto a slowly fading canvas, leaving ghost trails.</td></tr>
+</table>
+<h2 id="performance">Performance</h2>
+<table class="wikitable examples"><tr><th>Example</th><th>Description</th></tr>
+<tr><td><a href="examples/resolution/index.html">Resolution and manual updates</a></td><td>Turns off autoUpdate, times each motion.update() call and lets you change the processing resolution with a slider.</td></tr>
+</table>
+<div id="footer">p5.motion 0.1.0 · MIT License · Inspired by p5.vida by Paweł Janicki.</div>
+</div>
+</body>
+</html>
