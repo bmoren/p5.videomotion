@@ -97,6 +97,16 @@ Each example runs in the browser and asks for your camera.
 - [Overview & guide](https://bmoren.github.io/p5.videomotion/): concepts, tuning, troubleshooting, and [migrating from p5.vida](https://bmoren.github.io/p5.videomotion/#migrating-from-p5-vida)
 - [API reference](https://bmoren.github.io/p5.videomotion/reference.html): every function, property and event
 
+## AI usage disclosure
+
+This project follows the spirit of the [p5.js AI Usage Policy](https://github.com/processing/p5.js/blob/main/AI_USAGE_POLICY.md), which asks people to say which AI tools they used and how.
+
+- **Tools used:** Claude (Anthropic), through claude.ai and Claude Code.
+- **How it was used:** Much of the library code, documentation, examples and browser tests was written with Claude, working from the maintainer's requests. The maintainer chose the features and the API, reviewed the results, and is responsible for the project.
+- **How it was checked:** Behaviour is checked with automated browser tests (blob and zone accuracy, optical-flow accuracy, and every documentation example) on p5.js 2.x and 1.x, and with live camera testing.
+
+p5.videomotion is an independent add-on library, not part of p5.js itself. Contributions to *this* repository are welcome. Please use AI tools only as an aid, make sure you understand and have tested what you submit, and say in your pull request which tools you used.
+
 ## License
 
 MIT. Inspired by [p5.vida](http://tetoki.eu/vida) by Paweł Janicki.
