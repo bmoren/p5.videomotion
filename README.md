@@ -1,6 +1,6 @@
 # p5.videomotion
 
-![p5.videomotion](docs/p5.videomotion-banner.png)
+![p5.videomotion](p5.videomotion-banner.png)
 
 ### Webcam & motion tracking for p5.js 2.x
 

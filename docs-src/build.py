@@ -146,6 +146,8 @@ def build():
     os.makedirs(os.path.join(OUT, "examples"))
 
     shutil.copy(os.path.join(HERE, "style.css"), os.path.join(OUT, "style.css"))
+    # static assets kept in docs-src/ (docs/ is wiped on every build)
+    shutil.copy(os.path.join(HERE, "p5.videomotion-banner.png"), os.path.join(OUT, "p5.videomotion-banner.png"))
     shutil.copy(LIB, os.path.join(OUT, "lib", "p5.videomotion.js"))
     with open(os.path.join(OUT, "examples", "example-page.js"), "w") as f:
         f.write(EXAMPLE_HELPER)
