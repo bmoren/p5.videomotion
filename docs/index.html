@@ -41,7 +41,7 @@
 
 <p>It is written for interactive installations, performances and teaching. Everything is reported in canvas pixels, it updates itself every frame, and it uses the same callback style as p5.js. It is a rewrite of the ideas in <a href="#migrating-from-p5-vida">p5.vida</a>: about four to five times faster, and with optical flow added.</p>
 
-<div class="toc" role="navigation"><div class="toctitle">Contents</div><ul><li><a href="#overview"><span class="tocnumber">1</span> Overview</a></li><li><a href="#installation"><span class="tocnumber">2</span> Installation</a><ul><li><a href="#serving-the-page"><span class="tocnumber">2.1</span> Serving the page</a></li><li><a href="#p5-js-versions"><span class="tocnumber">2.2</span> p5.js versions</a></li></ul></li><li><a href="#quick-start"><span class="tocnumber">3</span> Quick start</a></li><li><a href="#concepts"><span class="tocnumber">4</span> Concepts</a><ul><li><a href="#coordinates"><span class="tocnumber">4.1</span> Coordinates</a></li><li><a href="#how-a-frame-is-processed"><span class="tocnumber">4.2</span> How a frame is processed</a></li><li><a href="#background-models"><span class="tocnumber">4.3</span> Background models</a></li><li><a href="#blobs"><span class="tocnumber">4.4</span> Blobs</a></li><li><a href="#zones"><span class="tocnumber">4.5</span> Zones</a></li><li><a href="#optical-flow"><span class="tocnumber">4.6</span> Optical flow</a></li></ul></li><li><a href="#performance"><span class="tocnumber">5</span> Performance</a></li><li><a href="#tuning"><span class="tocnumber">6</span> Tuning guide</a></li><li><a href="#troubleshooting"><span class="tocnumber">7</span> Troubleshooting</a></li><li><a href="#migrating-from-p5-vida"><span class="tocnumber">8</span> Migrating from p5.vida</a></li><li><a href="#limitations"><span class="tocnumber">9</span> Limitations</a></li><li><a href="#future-directions"><span class="tocnumber">10</span> Future directions</a></li><li><a href="#see-also"><span class="tocnumber">11</span> See also</a></li></ul></div>
+<div class="toc" role="navigation"><div class="toctitle">Contents</div><ul><li><a href="#overview"><span class="tocnumber">1</span> Overview</a></li><li><a href="#installation"><span class="tocnumber">2</span> Installation</a><ul><li><a href="#cdn"><span class="tocnumber">2.1</span> CDN</a></li><li><a href="#download"><span class="tocnumber">2.2</span> Download</a></li><li><a href="#serving-the-page"><span class="tocnumber">2.3</span> Serving the page</a></li><li><a href="#p5-js-versions"><span class="tocnumber">2.4</span> p5.js versions</a></li></ul></li><li><a href="#quick-start"><span class="tocnumber">3</span> Quick start</a></li><li><a href="#concepts"><span class="tocnumber">4</span> Concepts</a><ul><li><a href="#coordinates"><span class="tocnumber">4.1</span> Coordinates</a></li><li><a href="#how-a-frame-is-processed"><span class="tocnumber">4.2</span> How a frame is processed</a></li><li><a href="#background-models"><span class="tocnumber">4.3</span> Background models</a></li><li><a href="#blobs"><span class="tocnumber">4.4</span> Blobs</a></li><li><a href="#zones"><span class="tocnumber">4.5</span> Zones</a></li><li><a href="#optical-flow"><span class="tocnumber">4.6</span> Optical flow</a></li></ul></li><li><a href="#performance"><span class="tocnumber">5</span> Performance</a></li><li><a href="#tuning"><span class="tocnumber">6</span> Tuning guide</a></li><li><a href="#troubleshooting"><span class="tocnumber">7</span> Troubleshooting</a></li><li><a href="#migrating-from-p5-vida"><span class="tocnumber">8</span> Migrating from p5.vida</a></li><li><a href="#limitations"><span class="tocnumber">9</span> Limitations</a></li><li><a href="#future-directions"><span class="tocnumber">10</span> Future directions</a></li><li><a href="#see-also"><span class="tocnumber">11</span> See also</a></li></ul></div>
 <h2 id="overview">Overview</h2>
 <p>A sketch using p5.videomotion creates one <i>motion object</i> from a video source and reads results from it in <code>draw()</code>:</p>
 <ul>
@@ -53,11 +53,25 @@
 </ul>
 
 <h2 id="installation">Installation</h2>
+
+<h3 id="cdn">CDN</h3>
+<p>Load p5.videomotion <b>after</b> p5.js:</p>
+<pre>&lt;script src="https://cdn.jsdelivr.net/npm/p5@2/lib/p5.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://cdn.jsdelivr.net/gh/bmoren/p5.videomotion/p5.videomotion.js"&gt;&lt;/script&gt;
+&lt;script src="sketch.js"&gt;&lt;/script&gt;</pre>
+<p>Other CDN links:</p>
+<ul>
+<li>jsDelivr: <code>https://cdn.jsdelivr.net/gh/bmoren/p5.videomotion/p5.videomotion.js</code></li>
+<li>unpkg: <code>https://unpkg.com/p5.videomotion/p5.videomotion.js</code></li>
+</ul>
+<p>To pin a version, add a tag, for example <code>.../gh/bmoren/p5.videomotion@0.1.0/p5.videomotion.js</code>.</p>
+
+<h3 id="download">Download</h3>
 <p>Download <a href="lib/p5.videomotion.js"><code>p5.videomotion.js</code></a> and load it after p5.js:</p>
 <pre>&lt;script src="https://cdn.jsdelivr.net/npm/p5@2/lib/p5.min.js"&gt;&lt;/script&gt;
 &lt;script src="p5.videomotion.js"&gt;&lt;/script&gt;
 &lt;script src="sketch.js"&gt;&lt;/script&gt;</pre>
-<p>In the p5.js Web Editor, upload <code>p5.videomotion.js</code> to the sketch and add the second line to <code>index.html</code>.</p>
+<p>In the p5.js Web Editor, upload <code>p5.videomotion.js</code> to the sketch and add the second line to <code>index.html</code>, or paste the CDN line instead.</p>
 
 <h3 id="serving-the-page">Serving the page</h3>
 <p>Browsers only allow camera access on pages served over <code>https://</code> or from <code>http://localhost</code>. Opening <code>index.html</code> straight from disk (<code>file://</code>) will not work. From the sketch's folder, run any small web server, for example:</p>

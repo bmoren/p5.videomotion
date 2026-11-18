@@ -18,6 +18,8 @@ LIB = os.path.join(HERE, "..", "p5.videomotion.js")
 P5_CDN = "https://cdn.jsdelivr.net/npm/p5@2/lib/p5.min.js"
 VERSION = "0.1.0"
 
+ACTIVE_ATTR = ' class="active"'
+
 NAV = [
     ("index.html", "Main page"),
     ("reference.html", "Reference"),
@@ -92,7 +94,7 @@ def page(title, body, root, active=None, head_extra="", lead_toc=True, subtitle=
         i = body.index("<h2")
         body = body[:i] + toc_block + "\n" + body[i:]
     nav = "\n".join(
-        f'<li{" class=\"active\"" if href == active else ""}><a href="{root}{href}">{label}</a></li>'
+        f'<li{ACTIVE_ATTR if href == active else ""}><a href="{root}{href}">{label}</a></li>'
         for href, label in NAV)
     return f"""<!DOCTYPE html>
 <html lang="en">
